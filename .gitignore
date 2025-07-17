@@ -1,0 +1,40 @@
+# Test files
+test_all_phases.py
+test_phase3.py
+backend/test_phase_1_2.py
+backend/quick_model_test.py
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+audio_env_new/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Node.js dependencies
+node_modules/
+
+# Parent directory files
+../
+../*
