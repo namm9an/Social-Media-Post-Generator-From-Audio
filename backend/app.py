@@ -7,6 +7,14 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+
+# Structured logging setup must occur before other imports configure logging
+from logging import getLogger
+from backend.logging.logger_config import setup_logger
+
+setup_logger()
+logger = getLogger(__name__)
+
 import logging
 
 # Import our services
@@ -24,9 +32,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": os.getenv('CORS_ORIGINS', '*')}})
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Logger already configured globally via logger_config; retain `logger` defined above
 
 # Initialize services
 upload_handler = AudioUploadHandler(
@@ -37,6 +43,30 @@ upload_handler = AudioUploadHandler(
 whisper_service = WhisperService(
     model_name=os.getenv('WHISPER_MODEL', 'base')
 )
+
+# Start background memory manager
+from backend.performance.memory_manager import MemoryManager  # noqa: E402
+_memory_manager = MemoryManager()
+_memory_manager.start()
+
+# Worker pool for concurrent heavy tasks
+from backend.performance.worker_manager import WorkerManager  # noqa: E402
+import threading
+
+_worker_manager = WorkerManager(max_workers=int(os.getenv('MAX_WORKERS', 4)))
+
+def run_sync_in_worker(fn, *, description="job"):
+    """Run *fn* inside worker pool synchronously and return the result."""
+    completed = threading.Event()
+    container = {}
+
+    def _wrap():  # noqa: D401
+        container['result'] = fn()
+        completed.set()
+
+    _worker_manager.submit_job(_wrap, description=description)
+    completed.wait()
+    return container.get('result')
 
 # Load Whisper and FLAN-T5 models on startup
 try:
@@ -108,7 +138,7 @@ def transcribe_audio():
         
         # Start transcription
         file_path = file_metadata['file_path']
-        transcription_result = whisper_service.transcribe_audio(file_path)
+        transcription_result = run_sync_in_worker(lambda: whisper_service.transcribe_audio(file_path), description="transcription")
         
         # Save transcription
         whisper_service.save_transcription(file_id, transcription_result)
@@ -181,6 +211,13 @@ def delete_file(file_id):
             'error': 'Internal server error'
         }), 500
 
+# ---------------------------------------------------------------------------
+# Health & monitoring endpoints
+# ---------------------------------------------------------------------------
+from backend.monitoring.system_monitor import capture_metrics  # noqa: E402
+from backend.monitoring.app_monitor import metric_store  # noqa: E402
+
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -188,6 +225,46 @@ def health_check():
         'status': 'healthy',
         'whisper_model': whisper_service.model_name,
         'model_loaded': whisper_service.model is not None
+    }), 200
+
+
+@app.route('/api/health/detailed', methods=['GET'])
+def health_detailed():
+    """Return detailed system status."""
+    sys_metrics = capture_metrics()
+    return jsonify(sys_metrics.to_dict()), 200
+
+
+@app.route('/api/health/models', methods=['GET'])
+def health_models():
+    """Return status of AI models."""
+    return jsonify({
+        'whisper_loaded': whisper_service.model is not None,
+        'flan_t5_loaded': flan_t5_service.model is not None,
+    }), 200
+
+
+@app.route('/api/health/storage', methods=['GET'])
+def health_storage():
+    """Check storage space in upload directory."""
+    import shutil, pathlib
+    upload_dir = pathlib.Path(upload_handler.upload_folder)
+    total, used, free = shutil.disk_usage(upload_dir)
+    return jsonify({
+        'upload_dir': str(upload_dir),
+        'total_gb': total / 1024 ** 3,
+        'used_gb': used / 1024 ** 3,
+        'free_gb': free / 1024 ** 3,
+    }), 200
+
+
+@app.route('/api/metrics', methods=['GET'])
+def metrics():
+    """Return basic performance metrics collected in memory."""
+    return jsonify({
+        'avg_response_ms': metric_store.avg_response_ms,
+        'error_rate': metric_store.error_rate,
+        'request_count': metric_store.request_count,
     }), 200
 
 @app.route('/api/generate-posts', methods=['POST'])
@@ -219,7 +296,7 @@ def generate_posts():
                 prompt = get_template(platform, tone).format(content=transcription_text)
 
                 # Generate text using FLAN-T5
-                result = flan_t5_service.generate_text(prompt)
+                result = run_sync_in_worker(lambda: flan_t5_service.generate_text(prompt), description="flan-generate")
                 generated_text = result.get('text')
 
                 # Process content
@@ -275,7 +352,7 @@ def regenerate_post():
         prompt = get_template(platform, tone).format(content=transcription_text)
         
         # Generate text using FLAN-T5
-        result = flan_t5_service.generate_text(prompt)
+        result = run_sync_in_worker(lambda: flan_t5_service.generate_text(prompt), description="flan-generate")
         generated_text = result.get('text')
 
         # Process content
@@ -319,6 +396,21 @@ def get_generated_posts(post_id):
         logger.error(f"Error retrieving posts for {post_id}: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
+# ---------------------------------------------------------------------------
+# Production security & monitoring middleware (initialised **after** routes)
+# ---------------------------------------------------------------------------
+from backend.security.security_headers import init_security_headers  # noqa: E402
+from backend.security.rate_limiter import init_rate_limiter  # noqa: E402
+from backend.monitoring.app_monitor import register_middleware  # noqa: E402
+
+init_security_headers(app)
+init_rate_limiter(app)
+register_middleware(app)
+
+# Performance response optimisation (gzip, keep-alive)
+from backend.performance.response_optimizer import init_response_optimizer  # noqa: E402
+init_response_optimizer(app)
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=os.getenv('FLASK_ENV') != 'production', host='0.0.0.0', port=5000)
 

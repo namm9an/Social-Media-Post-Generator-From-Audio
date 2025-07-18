@@ -9,3 +9,9 @@ sentencepiece
 protobuf
 accelerate
 python-dotenv
+flask-limiter
+flask-talisman
+psutil
+python-json-logger
+pyclamd
+locust
