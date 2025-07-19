@@ -142,12 +142,19 @@ class FlanT5Service:
                 
                 # Load model
                 logger.info("Loading model...")
-                self.model = T5ForConditionalGeneration.from_pretrained(
-                    self.model_name,
-                    torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32,
-                    device_map="auto" if self.device == 'cuda' else None,
-                    low_cpu_mem_usage=True
-                )
+                if self.device == 'cuda':
+                    self.model = T5ForConditionalGeneration.from_pretrained(
+                        self.model_name,
+                        torch_dtype=torch.float16,
+                        device_map="auto",
+                        low_cpu_mem_usage=True
+                    )
+                else:
+                    # For CPU, don't use device_map or low_cpu_mem_usage
+                    self.model = T5ForConditionalGeneration.from_pretrained(
+                        self.model_name,
+                        torch_dtype=torch.float32
+                    )
                 
                 # Move model to device if not using device_map
                 if self.device != 'cuda' or not hasattr(self.model, 'hf_device_map'):
@@ -413,6 +420,22 @@ class FlanT5Service:
                 'reason': str(e)
             }
     
+    def aggressive_cleanup(self):
+        """Aggressive memory cleanup for memory management"""
+        try:
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+            
+            # Force garbage collection
+            import gc
+            gc.collect()
+            
+            logger.info("Aggressive memory cleanup completed")
+            
+        except Exception as e:
+            logger.error(f"Error during aggressive cleanup: {e}")
+    
     def cleanup(self):
         """Clean up resources"""
         try:
@@ -424,8 +447,8 @@ class FlanT5Service:
                 del self.tokenizer
                 self.tokenizer = None
             
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
+            # Aggressive cleanup
+            self.aggressive_cleanup()
             
             self._model_loaded = False
             logger.info("FLAN-T5 service cleaned up successfully")

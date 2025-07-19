@@ -8,7 +8,9 @@ class NotificationService {
     if (!this.initialized) {
       this.initialized = true;
       // Configure toast default options
-      toast.configure({
+      if (typeof toast.configure === 'function') {
+        // Backward-compatibility: older react-toastify versions
+        toast.configure({
         position: 'top-right',
         autoClose: 5000,
         hideProgressBar: false,
@@ -22,6 +24,7 @@ class NotificationService {
         bodyClassName: 'toast-body',
         progressClassName: 'toast-progress',
       });
+      }
     }
   }
 

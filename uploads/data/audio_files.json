@@ -1,1 +1,123 @@
-{}
+{
+  "bc2c9105-5e54-4c98-b83b-2aefdf520c80": {
+    "file_id": "bc2c9105-5e54-4c98-b83b-2aefdf520c80",
+    "filename": "transcribing_1.mp3",
+    "stored_filename": "bc2c9105-5e54-4c98-b83b-2aefdf520c80_20250719_004427_transcribing_1.mp3",
+    "file_path": "../uploads/audio\\bc2c9105-5e54-4c98-b83b-2aefdf520c80_20250719_004427_transcribing_1.mp3",
+    "size": 4363373,
+    "duration": 181.75297916666668,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T00:44:39.471654",
+    "status": "uploaded"
+  },
+  "80140b30-9af7-4933-84f4-8857cd39a383": {
+    "file_id": "80140b30-9af7-4933-84f4-8857cd39a383",
+    "filename": "transcribing_1.mp3",
+    "stored_filename": "80140b30-9af7-4933-84f4-8857cd39a383_20250719_004444_transcribing_1.mp3",
+    "file_path": "../uploads/audio\\80140b30-9af7-4933-84f4-8857cd39a383_20250719_004444_transcribing_1.mp3",
+    "size": 4363373,
+    "duration": 181.75297916666668,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T00:44:44.803606",
+    "status": "uploaded"
+  },
+  "48bdefa0-9b12-4db0-9432-ee0ebbc58abe": {
+    "file_id": "48bdefa0-9b12-4db0-9432-ee0ebbc58abe",
+    "filename": "transcribing_1.mp3",
+    "stored_filename": "48bdefa0-9b12-4db0-9432-ee0ebbc58abe_20250719_132553_transcribing_1.mp3",
+    "file_path": "../uploads/audio\\48bdefa0-9b12-4db0-9432-ee0ebbc58abe_20250719_132553_transcribing_1.mp3",
+    "size": 4363373,
+    "duration": 181.75297916666668,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T13:26:05.175898",
+    "status": "uploaded"
+  },
+  "dffe5760-4783-4f07-a37d-0b023dfbcbb3": {
+    "file_id": "dffe5760-4783-4f07-a37d-0b023dfbcbb3",
+    "filename": "transcribing_1.mp3",
+    "stored_filename": "dffe5760-4783-4f07-a37d-0b023dfbcbb3_20250719_132612_transcribing_1.mp3",
+    "file_path": "../uploads/audio\\dffe5760-4783-4f07-a37d-0b023dfbcbb3_20250719_132612_transcribing_1.mp3",
+    "size": 4363373,
+    "duration": 181.75297916666668,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T13:26:12.619084",
+    "status": "uploaded"
+  },
+  "5ae68e89-a47c-40bf-84ac-8949505bc638": {
+    "file_id": "5ae68e89-a47c-40bf-84ac-8949505bc638",
+    "filename": "transcribing_1.mp3",
+    "stored_filename": "5ae68e89-a47c-40bf-84ac-8949505bc638_20250719_132751_transcribing_1.mp3",
+    "file_path": "../uploads/audio\\5ae68e89-a47c-40bf-84ac-8949505bc638_20250719_132751_transcribing_1.mp3",
+    "size": 4363373,
+    "duration": 181.75297916666668,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T13:27:51.213358",
+    "status": "uploaded"
+  },
+  "3dfa8a59-1a54-4035-96a9-ffa785783f0f": {
+    "file_id": "3dfa8a59-1a54-4035-96a9-ffa785783f0f",
+    "filename": "transcribing_1.mp3",
+    "stored_filename": "3dfa8a59-1a54-4035-96a9-ffa785783f0f_20250719_153255_transcribing_1.mp3",
+    "file_path": "../uploads/audio\\3dfa8a59-1a54-4035-96a9-ffa785783f0f_20250719_153255_transcribing_1.mp3",
+    "size": 4363373,
+    "duration": 181.75297916666668,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T15:33:26.150554",
+    "status": "uploaded"
+  },
+  "4b6b50ef-d7ce-485a-9e6e-80941f347667": {
+    "file_id": "4b6b50ef-d7ce-485a-9e6e-80941f347667",
+    "filename": "transcribing_1.mp3",
+    "stored_filename": "4b6b50ef-d7ce-485a-9e6e-80941f347667_20250719_153914_transcribing_1.mp3",
+    "file_path": "../uploads/audio\\4b6b50ef-d7ce-485a-9e6e-80941f347667_20250719_153914_transcribing_1.mp3",
+    "size": 4363373,
+    "duration": 181.75297916666668,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T15:39:18.270007",
+    "status": "uploaded"
+  },
+  "8a578b87-e810-4313-b863-ee42a55f4316": {
+    "file_id": "8a578b87-e810-4313-b863-ee42a55f4316",
+    "filename": "transcribing_2.mp3",
+    "stored_filename": "8a578b87-e810-4313-b863-ee42a55f4316_20250719_154418_transcribing_2.mp3",
+    "file_path": "D:\\Academics\\projects\\Social Media Post Generator from Audio\\uploads\\audio\\8a578b87-e810-4313-b863-ee42a55f4316_20250719_154418_transcribing_2.mp3",
+    "size": 3574141,
+    "duration": 223.3218820861678,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T15:44:21.949635",
+    "status": "uploaded"
+  },
+  "1a4a43c8-62d8-45ea-9b3a-fb4286585c51": {
+    "file_id": "1a4a43c8-62d8-45ea-9b3a-fb4286585c51",
+    "filename": "transcribing_2.mp3",
+    "stored_filename": "1a4a43c8-62d8-45ea-9b3a-fb4286585c51_20250719_160209_transcribing_2.mp3",
+    "file_path": "D:\\Academics\\projects\\Social Media Post Generator from Audio\\uploads\\audio\\1a4a43c8-62d8-45ea-9b3a-fb4286585c51_20250719_160209_transcribing_2.mp3",
+    "size": 3574141,
+    "duration": 223.3218820861678,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T16:02:14.614726",
+    "status": "uploaded"
+  },
+  "b5eb1b02-8888-4cbe-8638-b5309c1df257": {
+    "file_id": "b5eb1b02-8888-4cbe-8638-b5309c1df257",
+    "filename": "transcribing_1.mp3",
+    "stored_filename": "b5eb1b02-8888-4cbe-8638-b5309c1df257_20250719_160407_transcribing_1.mp3",
+    "file_path": "D:\\Academics\\projects\\Social Media Post Generator from Audio\\uploads\\audio\\b5eb1b02-8888-4cbe-8638-b5309c1df257_20250719_160407_transcribing_1.mp3",
+    "size": 4363373,
+    "duration": 181.75297916666668,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T16:04:07.043756",
+    "status": "uploaded"
+  },
+  "0a50515a-4ceb-458b-adac-002d28f69ebd": {
+    "file_id": "0a50515a-4ceb-458b-adac-002d28f69ebd",
+    "filename": "transcribing_2.mp3",
+    "stored_filename": "0a50515a-4ceb-458b-adac-002d28f69ebd_20250719_161020_transcribing_2.mp3",
+    "file_path": "D:\\Academics\\projects\\Social Media Post Generator from Audio\\uploads\\audio\\0a50515a-4ceb-458b-adac-002d28f69ebd_20250719_161020_transcribing_2.mp3",
+    "size": 3574141,
+    "duration": 223.3218820861678,
+    "format": "mp3",
+    "uploaded_at": "2025-07-19T16:10:33.687491",
+    "status": "uploaded"
+  }
+}

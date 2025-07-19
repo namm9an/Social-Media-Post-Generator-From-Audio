@@ -54,15 +54,48 @@ class MemoryManager(threading.Thread):
         proc = psutil.Process(os.getpid())
         return int(proc.memory_info().rss / 1024 ** 2)
 
+    def aggressive_cleanup(self):
+        """Perform aggressive memory cleanup"""
+        try:
+            # Force multiple garbage collections
+            for _ in range(3):
+                gc.collect()
+            
+            # Clean up torch cache if available
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.synchronize()
+            except ImportError:
+                pass
+            
+            # Try to cleanup FLAN-T5 service if available
+            try:
+                from services.text_generation.flan_t5_service import flan_t5_service
+                flan_t5_service.aggressive_cleanup()
+            except ImportError:
+                pass
+            
+            logger.info("Aggressive memory cleanup completed")
+            
+        except Exception as e:
+            logger.error(f"Aggressive cleanup failed: {e}")
+    
     def run(self) -> None:  # noqa: D401
         logger.info("MemoryManager started – monitoring every %s s", self.interval)
         while not self._stop.is_set():
             usage = self.memory_mb
             if usage >= self.thresholds.critical:
                 logger.error("Critical memory usage: %s MiB – initiating cleanup", usage)
-                self.cleanup_callback()
+                self.aggressive_cleanup()
             elif usage >= self.thresholds.warning:
                 logger.warning("High memory usage: %s MiB", usage)
+                self.cleanup_callback()
+            else:
+                # Only log normal usage occasionally to reduce log noise
+                if usage % 100 == 0 or usage > 500:  # Log every 100MB or if over 500MB
+                    logger.info("Normal memory usage: %s MiB", usage)
             time.sleep(self.interval)
 
     def stop(self) -> None:

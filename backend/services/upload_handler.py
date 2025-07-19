@@ -99,7 +99,7 @@ class AudioUploadHandler:
             original_filename = secure_filename(file.filename)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             stored_filename = f"{file_id}_{timestamp}_{original_filename}"
-            file_path = os.path.join(self.upload_folder, stored_filename)
+            file_path = os.path.abspath(os.path.join(self.upload_folder, stored_filename))
             
             # Save file
             file.save(file_path)

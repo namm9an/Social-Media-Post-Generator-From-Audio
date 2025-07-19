@@ -8,6 +8,15 @@ from pydub import AudioSegment
 from pydub.effects import normalize
 import librosa
 import numpy as np
+from pathlib import Path
+
+# Configure FFmpeg for pydub
+current_dir = Path(__file__).parent.parent
+ffmpeg_path = current_dir / "ffmpeg" / "bin" / "ffmpeg.exe"
+if ffmpeg_path.exists():
+    AudioSegment.converter = str(ffmpeg_path)
+    AudioSegment.ffmpeg = str(ffmpeg_path)
+    AudioSegment.ffprobe = str(current_dir / "ffmpeg" / "bin" / "ffprobe.exe")
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +30,13 @@ class WhisperService:
         """
         self.model_name = model_name
         self.model = None
-        self.transcriptions_json = os.path.join("../uploads/data", "transcriptions.json")
+        # Use absolute path to uploads directory
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        parent_dir = os.path.dirname(base_dir)
+        self.transcriptions_json = os.path.abspath(os.path.join(parent_dir, "uploads", "data", "transcriptions.json"))
+        
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(self.transcriptions_json), exist_ok=True)
         
         # Ensure JSON file exists
         if not os.path.exists(self.transcriptions_json):
@@ -70,7 +85,10 @@ class WhisperService:
             audio = audio.set_frame_rate(16000)
             
             # Export preprocessed audio
-            preprocessed_path = file_path.replace('.', '_preprocessed.')
+            preprocessed_path = os.path.join(
+                os.path.dirname(file_path), 
+                os.path.basename(file_path).replace('.', '_preprocessed.')
+            )
             audio.export(preprocessed_path, format="wav")
             
             logger.info(f"Audio preprocessed: {preprocessed_path}")
@@ -146,23 +164,32 @@ class WhisperService:
             dict: Transcription result with metadata
         """
         try:
+            logger.info(f"[TRANSCRIBE] Starting transcription for: {file_path}")
+            
             # Load model
+            logger.info(f"[TRANSCRIBE] Loading model: {self.model_name}")
             model = self.load_whisper_model()
             
             # Preprocess audio
+            logger.info(f"[TRANSCRIBE] Preprocessing audio...")
             preprocessed_path = self.preprocess_audio(file_path)
             
-            # Transcribe audio
-            logger.info(f"Starting transcription: {file_path}")
+            # Transcribe audio with optimized settings
+            logger.info(f"[TRANSCRIBE] Running Whisper inference...")
             start_time = datetime.now()
             
             result = model.transcribe(
                 preprocessed_path,
                 language=language,
                 task=task,
-                word_timestamps=True,
-                verbose=False
+                word_timestamps=False,  # Disable for speed
+                verbose=False,
+                temperature=0,  # Deterministic output for speed
+                beam_size=1,   # Single beam for speed
+                best_of=1      # Single candidate for speed
             )
+            
+            logger.info(f"[TRANSCRIBE] Whisper inference completed")
             
             end_time = datetime.now()
             processing_time = (end_time - start_time).total_seconds()
@@ -273,3 +300,40 @@ class WhisperService:
         except Exception as e:
             logger.error(f"Error reading transcriptions: {str(e)}")
             return []
+    
+    def update_transcription(self, transcription_id, new_text):
+        """
+        Update the text of an existing transcription.
+        
+        Args:
+            transcription_id (str): Transcription identifier
+            new_text (str): New transcription text
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Read existing transcriptions
+            with open(self.transcriptions_json, 'r') as f:
+                transcriptions = json.load(f)
+            
+            # Check if transcription exists
+            if transcription_id not in transcriptions:
+                logger.error(f"Transcription {transcription_id} not found")
+                return False
+            
+            # Update the text and add edit timestamp
+            transcriptions[transcription_id]['text'] = new_text
+            transcriptions[transcription_id]['edited'] = True
+            transcriptions[transcription_id]['edited_at'] = datetime.now().isoformat()
+            
+            # Write back to file
+            with open(self.transcriptions_json, 'w') as f:
+                json.dump(transcriptions, f, indent=2)
+            
+            logger.info(f"Transcription {transcription_id} updated successfully")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error updating transcription: {str(e)}")
+            return False

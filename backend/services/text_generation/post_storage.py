@@ -32,13 +32,18 @@ class PostStorage:
     - Backup functionality
     """
     
-    def __init__(self, data_file: str = "../uploads/data/generated_posts.json"):
+    def __init__(self, data_file: str = None):
         """
         Initialize the post storage service
         
         Args:
             data_file: Path to the JSON data file
         """
+        if data_file is None:
+            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            parent_dir = os.path.dirname(base_dir)
+            data_file = os.path.join(parent_dir, "uploads", "data", "generated_posts.json")
+        
         self.data_file = os.path.abspath(data_file)
         self.data_dir = os.path.dirname(self.data_file)
         self.backup_dir = os.path.join(self.data_dir, 'backups')
