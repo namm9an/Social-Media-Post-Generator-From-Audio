@@ -16,7 +16,7 @@ audio_env_new/
 venv/
 env/
 ENV/
-
+.venv/
 # IDE
 .vscode/
 .idea/

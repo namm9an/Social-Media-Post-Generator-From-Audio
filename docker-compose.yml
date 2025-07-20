@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  backend:
+    image: namann4/ai-social-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai-social-backend
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+      - WHISPER_MODEL=base
+      - MAX_WORKERS=4
+      - UPLOAD_FOLDER=/app/uploads/audio
+      - DATA_FOLDER=/app/uploads/data
+      - CORS_ORIGINS=*
+    ports:
+      - "5000:5000"
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_models:/app/models
+      - backend_logs:/app/logs
+    networks:
+      - ai-social-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    image: namann4/ai-social-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ai-social-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ai-social-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+networks:
+  ai-social-network:
+    driver: bridge
+
+volumes:
+  backend_uploads:
+    driver: local
+  backend_models:
+    driver: local
+  backend_logs:
+    driver: local

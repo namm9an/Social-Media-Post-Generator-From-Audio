@@ -56,7 +56,7 @@ const TranscriptionEnhanced = ({
     const toastId = NotificationService.transcriptionProgress('Starting transcription...');
     
     try {
-      const response = await fetch('http://localhost:5000/api/transcribe', {
+      const response = await fetch('http://216.48.181.216:5000/api/transcribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

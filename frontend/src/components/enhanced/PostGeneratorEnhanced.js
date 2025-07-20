@@ -112,7 +112,7 @@ const PostGeneratorEnhanced = ({
     const toastId = NotificationService.generationProgress('', 0, selectedPlatforms.length);
 
     try {
-      const response = await fetch('http://localhost:5000/api/generate-posts', {
+      const response = await fetch('http://216.48.181.216:5000/api/generate-posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ const PostGeneratorEnhanced = ({
     const toastId = NotificationService.generationProgress(platform, 0, 1);
 
     try {
-      const response = await fetch('http://localhost:5000/api/regenerate-post', {
+      const response = await fetch('http://216.48.181.216:5000/api/regenerate-post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
